@@ -37,32 +37,32 @@ int execute(Pipe *p, int *status) {
     pipe(pipes[i]);
   }
 
-  for (i = start + 1; i < p->count; i++) {
+  for (i = start; i < p->count; i++) {
     if (!(pids[i] = fork())) {
       dup2(pipes[i][0], 0);
       dup2(pipes[i+1][1], 1);
 
-      for (j = start; j < i-1; j++) {
-        close(pipes[j][0]);
-        close(pipes[j][1]);
+      for (j = start; j < i; j++) {
+        if (pipes[j][0] != 0) close(pipes[j][0]);
+        if (pipes[j][1] != 1) close(pipes[j][1]);
       }
       close(pipes[i][1]);
       close(pipes[i+1][0]);
       for (j = i+2; j <= p->count; j++) {
-        close(pipes[j][0]);
-        close(pipes[j][1]);
+        if (pipes[j][0] != 0) close(pipes[j][0]);
+        if (pipes[j][1] != 1) close(pipes[j][1]);
       }
-      execv(argv[i][0], argv[i]);
+      execv(p->argv[i][0], p->argv[i]);
       exit(1);
     }
   }
 
   for (i = start; i <= p->count; i++) {
-    close(pipes[i][0]);
-    close(pipes[i][1]);
+    if (pipes[i][0] != 0) close(pipes[i][0]);
+    if (pipes[i][1] != 1) close(pipes[i][1]);
   }
 
-  for (i = start + 1; i < p->count; i++) {
+  for (i = start; i < p->count; i++) {
     waitpid(pids[i], &l_status, 0);
   }
 
