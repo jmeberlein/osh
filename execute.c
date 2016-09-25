@@ -13,6 +13,11 @@ int execute(Pipe *p, int *status) {
     return 1;
   }
 
+  if (*status && p->count == 1) {
+    *status = p->type == ON_FAILURE ? 0 : 1;
+    return 0;
+  }
+
   int i, j, start, in, out, l_status;
   int pipes[p->count + 1][2];
   int pids[p->count];
@@ -42,6 +47,8 @@ int execute(Pipe *p, int *status) {
       dup2(pipes[i][0], 0);
       dup2(pipes[i+1][1], 1);
 
+      // Close all but the required file descriptors,
+      // skipping 1 and 0 (stdout and stdin)
       for (j = start; j < i; j++) {
         if (pipes[j][0] != 0) close(pipes[j][0]);
         if (pipes[j][1] != 1) close(pipes[j][1]);

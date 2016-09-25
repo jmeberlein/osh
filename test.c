@@ -30,6 +30,6 @@ int main() {
   p->argv[2][0] = "/bin/cat";
   p->argv[2][1] = NULL;
   
-  int status = 0;
+  int status = 1;
   execute(p, &status);
 }
