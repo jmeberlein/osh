@@ -8,3 +8,9 @@ typedef struct {
   Link type;
 } Pipe;
 
+typedef struct {
+  char *in;
+  char *out;
+  char **argv;
+  Link type;
+} Command;
