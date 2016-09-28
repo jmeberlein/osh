@@ -8,49 +8,50 @@
 #include"functions.h"
 
 int main() {
-  Pipe *p = malloc(sizeof(Pipe)*3);
+  Command *c = malloc(sizeof(Command)*4);
 
-  p[0].in = open("test.c", O_RDONLY);
-  p[0].out = 1;
-  p[0].count = 1;
-  p[0].type = ON_SUCCESS;
+  c[0].in = "test.c";
+  c[0].out = "";
+  c[0].type = PIPE;
 
-  p[0].argv = malloc(sizeof(char**) * 1);
-  p[0].argv[0] = malloc(sizeof(char*) * 5);
-  p[0].argv[0][0] = "/bin/grep";
-  p[0].argv[0][1] = "main";
-  p[0].argv[0][2] = "-";
-  p[0].argv[0][3] = "-q";
-  p[0].argv[0][4] = NULL;
+  c[0].argv = malloc(sizeof(char*) * 4);
+  c[0].argv[0] = "/bin/grep";
+  c[0].argv[1] = "main";
+  c[0].argv[2] = "-";
+  c[0].argv[3] = NULL;
 
+  c[1].in = "";
+  c[1].out = "";
+  c[1].type = ON_SUCCESS;
 
-  p[1].in = 0;
-  p[1].out = 1;
-  p[1].count = 1;
-  p[1].type = ON_FAILURE;
+  c[1].argv = malloc(sizeof(char*) * 2);
+  c[1].argv[0] = "/bin/cat";
+  c[1].argv[1] = NULL;
 
-  p[1].argv = malloc(sizeof(char**) * 1);
-  p[1].argv[0] = malloc(sizeof(char*) * 3);
-  p[1].argv[0][0] = "/bin/echo";
-  p[1].argv[0][1] = "Success!";
-  p[1].argv[0][2] = NULL;
+  c[2].in = "";
+  c[2].out = "";
+  c[2].type = ON_FAILURE;
 
+  c[2].argv = malloc(sizeof(char*) * 3);
+  c[2].argv[0] = "/bin/echo";
+  c[2].argv[1] = "Success!";
+  c[2].argv[2] = NULL;
 
-  p[2].in = 0;
-  p[2].out = 1;
-  p[2].count = 1;
-  p[2].type = ALWAYS;
+  c[3].in = "";
+  c[3].out = "";
+  c[3].type = ALWAYS;
 
-  p[2].argv = malloc(sizeof(char**) * 1);
-  p[2].argv[0] = malloc(sizeof(char*) * 3);
-  p[2].argv[0][0] = "/bin/echo";
-  p[2].argv[0][1] = "Failure...";
-  p[2].argv[0][2] = NULL;
+  c[3].argv = malloc(sizeof(char*) * 3);
+  c[3].argv[0] = "/bin/echo";
+  c[3].argv[1] = "Failure...";
+  c[3].argv[2] = NULL;
 
+  Pipe *p;
+  int count = break_chain(c, 4, &p);
   
   int status = 0;
   int i;
-  for (i = 0; i < 3; i++){
+  for (i = 0; i < count; i++){
     execute(&p[i], &status);
   }
 }

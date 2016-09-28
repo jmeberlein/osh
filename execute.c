@@ -84,12 +84,12 @@ int execute(Pipe *p, int *status) {
   return 0;
 }
 
-int break_chain(Command *commands, int in_count, Pipe **out) {
-  if (commands == NULL || out == NULL || in_count == 0) {
+int break_chain(Command *commands, int n, Pipe **out) {
+  if (commands == NULL || out == NULL || n == 0) {
     return 0;
   }
 
-  int i, j, k, m, count;
+  int i, j, k, m, c, count;
   
   count = 1;
   for (i = 0; i < n-1; i++) {
@@ -99,13 +99,23 @@ int break_chain(Command *commands, int in_count, Pipe **out) {
   }
 
   *out = (Pipe*)malloc(sizeof(Pipe)*count);
+  c = i = 0;
   j = -1;
-  count = i = 0;
-  while (i < n) {
-    count++; i++;
+  while (i < n - 1) {
+    c++; i++;
     if (i == n || commands[i].type != PIPE || *(commands[i].out) != 0 || *(commands[i].in) != 0) {
-      out[m].in = open(commands[j+1], O_RDONLY);
-      out[m].out = open(commands[i-1], O_WRONLY);
+      (*out)[m].in = *(commands[j+1].in) == 0 ? 0 : open(commands[j+1].in, O_RDONLY);
+      (*out)[m].out = *(commands[i].in) == 0 ? 1 : open(commands[i].out, O_WRONLY);
+      (*out)[m].type = commands[i].type;
+      (*out)[m].count = c;
+      (*out)[m].argv = (char***)malloc(sizeof(char**)*c);
+      c = k = 0;
+      while (j != i) {
+        (*out)[m].argv[k++] = commands[++j].argv;
+      }
+      m++;
     }
   }
+
+  return count;
 }
