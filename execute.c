@@ -119,3 +119,106 @@ int break_chain(Command *commands, int n, Pipe **out) {
 
   return count;
 }
+
+int tokenize(char *str, char ***arr, int *count) {
+  if (str == NULL || arr == NULL || count == NULL) {
+    return 1;
+  }
+
+  int i, state, lag;
+  
+  state = 0;
+  *count = 0;
+  for (i = 0; str[i] != '\0'; i++) {
+    switch (state) {
+    case 0:
+      switch (str[i]) {
+      case ' ':
+      case '\t':
+        state = 0;
+        continue;
+      case '\\':
+        state = 2;
+        continue;
+      case '"':
+        state = 5;
+        continue;
+      case '\'':
+        state = 3;
+        continue;
+      default:
+        state = 1;
+        continue;
+      }
+    
+    case 1:
+      switch (str[i]) {
+      case ' ':
+      case '\t':
+        state = 0;
+        (*count)++;
+        continue;
+      case '\\':
+        state = 2;
+        continue;
+      case '"':
+        state = 5;
+        continue;
+      case '\'':
+        state = 3;
+        continue;
+      default:
+        state = 1;
+        continue;
+      }
+      
+    case 2:
+      switch (str[i]) {
+      default:
+        state = 1;
+        continue;
+      }
+    
+    case 3:
+      switch (str[i]) {
+      case '\'':
+        state = 1;
+        continue;
+      default:
+        state = 3;
+        continue;
+      }
+
+    case 4:
+      switch (str[i]) {
+      case '\\':
+        state = 5;
+        continue;
+      case '"':
+        state = 1;
+        continue;
+      default:
+        state = 4;
+        continue;
+      }
+
+    case 5:
+      switch (str[i]) {
+      case '"':
+        state = 1;
+        continue;
+      default:
+        state = 5;
+        continue;
+      }
+    }
+  }
+
+  if (state == 1) {
+    (*count)++;
+  } else if (state > 1) {
+    return 2;
+  }
+
+  return 0;
+}
