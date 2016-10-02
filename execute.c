@@ -4,7 +4,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 
-#include"datatypes.h"
+#include"execute.h"
 
 #define fp_null (open("/dev/null", O_RDONLY))
 
@@ -59,7 +59,7 @@ int execute(Pipe *p, int *status) {
         if (pipes[j][0] != 0) close(pipes[j][0]);
         if (pipes[j][1] != 1) close(pipes[j][1]);
       }
-      execv(p->argv[i][0], p->argv[i]);
+      execvp(p->argv[i][0], p->argv[i]);
       exit(1);
     }
   }
@@ -93,19 +93,19 @@ int break_chain(Command *commands, int n, Pipe **out) {
   
   count = 1;
   for (i = 0; i < n-1; i++) {
-    if (commands[i].type != PIPE || *(commands[i].out) != 0 || *(commands[i].in) != 0) {
+    if (commands[i].type != PIPE || commands[i].out != 0 || commands[i+1].in != 0) {
       count++;
     } 
   }
 
   *out = (Pipe*)malloc(sizeof(Pipe)*count);
-  c = i = 0;
-  j = -1;
+  c = 0;
+  i = j = -1;
   while (i < n - 1) {
     c++; i++;
-    if (i == n || commands[i].type != PIPE || *(commands[i].out) != 0 || *(commands[i].in) != 0) {
-      (*out)[m].in = *(commands[j+1].in) == 0 ? 0 : open(commands[j+1].in, O_RDONLY);
-      (*out)[m].out = *(commands[i].in) == 0 ? 1 : open(commands[i].out, O_WRONLY);
+    if (i == n || commands[i].type != PIPE || commands[i].out != 0 || commands[i+1].in != 0) {
+      (*out)[m].in = commands[j+1].in == 0 ? 0 : open(commands[j+1].in, O_RDONLY);
+      (*out)[m].out = commands[i].out == 0 ? 1 : open(commands[i].out, O_WRONLY);
       (*out)[m].type = commands[i].type;
       (*out)[m].count = c;
       (*out)[m].argv = (char***)malloc(sizeof(char**)*c);
@@ -118,107 +118,4 @@ int break_chain(Command *commands, int n, Pipe **out) {
   }
 
   return count;
-}
-
-int tokenize(char *str, char ***arr, int *count) {
-  if (str == NULL || arr == NULL || count == NULL) {
-    return 1;
-  }
-
-  int i, state, lag;
-  
-  state = 0;
-  *count = 0;
-  for (i = 0; str[i] != '\0'; i++) {
-    switch (state) {
-    case 0:
-      switch (str[i]) {
-      case ' ':
-      case '\t':
-        state = 0;
-        continue;
-      case '\\':
-        state = 2;
-        continue;
-      case '"':
-        state = 5;
-        continue;
-      case '\'':
-        state = 3;
-        continue;
-      default:
-        state = 1;
-        continue;
-      }
-    
-    case 1:
-      switch (str[i]) {
-      case ' ':
-      case '\t':
-        state = 0;
-        (*count)++;
-        continue;
-      case '\\':
-        state = 2;
-        continue;
-      case '"':
-        state = 5;
-        continue;
-      case '\'':
-        state = 3;
-        continue;
-      default:
-        state = 1;
-        continue;
-      }
-      
-    case 2:
-      switch (str[i]) {
-      default:
-        state = 1;
-        continue;
-      }
-    
-    case 3:
-      switch (str[i]) {
-      case '\'':
-        state = 1;
-        continue;
-      default:
-        state = 3;
-        continue;
-      }
-
-    case 4:
-      switch (str[i]) {
-      case '\\':
-        state = 5;
-        continue;
-      case '"':
-        state = 1;
-        continue;
-      default:
-        state = 4;
-        continue;
-      }
-
-    case 5:
-      switch (str[i]) {
-      case '"':
-        state = 1;
-        continue;
-      default:
-        state = 5;
-        continue;
-      }
-    }
-  }
-
-  if (state == 1) {
-    (*count)++;
-  } else if (state > 1) {
-    return 2;
-  }
-
-  return 0;
 }

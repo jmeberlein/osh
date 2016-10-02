@@ -1,17 +1,21 @@
-#include<fcntl.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include<sys/wait.h>
-#include<unistd.h>
+#include<string.h>
 
-#include"datatypes.h"
-#include"functions.h"
+#include"tokenize.h"
 
 int main() {
   char **arr;
-  char *str = "Hello World 'Single Quote' \"Double Quote\" '\"Nested'\"\"";
-  int count;
+  char *tmp = "Hello World      'Single Quote'\t\"Double Quote\" '\"Nested'\"\"";
+  char *str = malloc(sizeof(char)*59);
+  strcpy(str, tmp);
+  int count, i;
 
   tokenize(str, &arr, &count);
+
+  for (i = 0; i < count; i++) {
+    printf("%s\n", arr[i]);
+  }
+
   return 0;
 }

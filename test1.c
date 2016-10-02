@@ -4,8 +4,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 
-#include"datatypes.h"
-#include"functions.h"
+#include"execute.h"
 
 int main() {
   Pipe *p = malloc(sizeof(Pipe));
@@ -16,20 +15,22 @@ int main() {
 
   p->argv = malloc(sizeof(char**) * 3);
   p->argv[0] = malloc(sizeof(char*) * 3);
-  p->argv[0][0] = "/bin/ls";
+  p->argv[0][0] = "ls";
   p->argv[0][1] = "-l";
   p->argv[0][2] = NULL;
 
   p->argv[1] = malloc(sizeof(char*) * 4);
-  p->argv[1][0] = "/bin/grep";
+  p->argv[1][0] = "grep";
   p->argv[1][1] = "test";
   p->argv[1][2] = "-";
   p->argv[1][3] = NULL;
 
   p->argv[2] = malloc(sizeof(char*) * 2);
-  p->argv[2][0] = "/bin/cat";
+  p->argv[2][0] = "cat";
   p->argv[2][1] = NULL;
   
-  int status = 1;
+  int status = 0;
   execute(p, &status);
+
+  return 0;
 }
