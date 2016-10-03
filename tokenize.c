@@ -15,6 +15,7 @@ int tokenize(char *str, char ***arr, int *count) {
       switch (str[i]) {
       case ' ':
       case '\t':
+      case '\n':
         state = 0;
         continue;
       case '\\':
@@ -35,6 +36,7 @@ int tokenize(char *str, char ***arr, int *count) {
       switch (str[i]) {
       case ' ':
       case '\t':
+      case '\n':
         state = 0;
         (*count)++;
         continue;
@@ -110,6 +112,7 @@ int tokenize(char *str, char ***arr, int *count) {
       switch (str[i]) {
       case ' ':
       case '\t':
+      case '\n':
         state = 0;
         continue;
       case '\\':
@@ -134,6 +137,7 @@ int tokenize(char *str, char ***arr, int *count) {
       switch (str[i]) {
       case ' ':
       case '\t':
+      case '\n':
         str[i] = '\0';
         state = 0;
         continue;

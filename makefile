@@ -3,8 +3,8 @@ CFLAGS = -g -Wall
 
 default: osh
 
-osh: tokenize.o execute.o
-	$(CC) $(CFLAGS) -o osh osh.c tokenize.o execute.o
+osh: tokenize.o execute.o parse.o	
+	$(CC) $(CFLAGS) -o osh osh.c tokenize.o parse.o execute.o
 
 tokenize.o: 
 	$(CC) $(CFLAGS) -c tokenize.c
