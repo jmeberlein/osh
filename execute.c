@@ -105,7 +105,7 @@ int break_chain(Command *commands, int n, Pipe **out) {
     c++; i++;
     if (i == n || commands[i].type != PIPE || commands[i].out != 0 || commands[i+1].in != 0) {
       (*out)[m].in = commands[j+1].in == 0 ? 0 : open(commands[j+1].in, O_RDONLY);
-      (*out)[m].out = commands[i].out == 0 ? 1 : open(commands[i].out, O_WRONLY);
+      (*out)[m].out = commands[i].out == 0 ? 1 : open(commands[i].out, O_WRONLY | O_CREAT, 0664);
       (*out)[m].type = commands[i].type;
       (*out)[m].count = c;
       (*out)[m].argv = (char***)malloc(sizeof(char**)*c);

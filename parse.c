@@ -140,7 +140,7 @@ int parse(char **tok, int in_size, Command **arr, int *out_size) {
         }
         scrub(tok[j]);
       }
-      if (i == in_size - 1 && !IS_FILE(tok[i-1])) {
+      if (i == in_size - 1 && (i == 0 || !IS_FILE(tok[i-1]))) {
         (*arr)[k].argv[n++] = tok[i];
         scrub(tok[i]);
       }

@@ -13,7 +13,7 @@ int main() {
   Pipe *p;
   int i, j, status, c_count, p_count, t_count;
 
-  printf("osh>");
+  printf("osh> ");
   while (fgets(str, 256, stdin) != NULL && strcmp(str, "exit\n")) {
       tokenize(str, &tok, &t_count);
       parse(tok, t_count, &c, &c_count);
@@ -28,7 +28,7 @@ int main() {
       }     
       //free(p);
       //free(c);
-      printf("osh>");
+      printf("osh> ");
   }
 
   return 0;
